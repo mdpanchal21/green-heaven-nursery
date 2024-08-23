@@ -1,0 +1,275 @@
+    {% extends 'base.html' %}
+
+    {% block title %}checkout{% endblock %}
+
+    {% load static %}
+    {% block extra_head %}
+        <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+    {% endblock %}
+
+    {% block content %}
+     <div class="progress-bar">
+            <ul class="progress">
+                  <li class="active">Shipping</li>
+                  <li>Order Summery</li>
+                  <li >Payment</li>
+                  <li>Confirmation</li>
+            </ul>
+      </div>
+      {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+      <section id="checkout-container" >
+            <div class="col-one" >
+                  <div class="shiping-form-container" id="shiping-form-container">
+                        <div id="error"></div>
+                        <div class="title">
+                              <h4>Shipping address</h4>
+                        </div>
+                        <div class="address-select">
+                             <!-- <div class="address-details">
+                              {% if address %}
+                                    <input type="radio" name="address" id="r-a" value={{address.id}}>
+                                    <div class="address-dispay">
+                                    {{address.fname}} {{address.lname}}<br>
+                                    mobile no : {{ address.phone }}<br><br>
+                                    {{address}}</div><br>
+                                    <button id="edit" class="edit">Edit</button>
+                              {% else %}
+                                    <button id="new">Add Now</button>
+                              {% endif %}
+                              </div>      -->
+                        </div>
+                        <form method="post" id="order" action="{% url 'order' %}">
+                              {% csrf_token %}
+                        <div class="shiping-form " id="shiping-form">
+                              
+                              {% if Shipping_form %}
+                              <div class="input-control">
+                                    {% for field in Shipping_form %}
+                                    <small class="error" id="{{field.name}}-error" >{{field.errors|striptags}}</small>
+                                    {{ field.label_tag }}
+                                    {{ field }} 
+                                    
+                                    {% endfor %}
+                              </div>
+                              {% endif %}
+                              
+                        </div>
+                       
+                        <div class="title">
+                              <h4>billing address</h4>
+                        </div>
+                        <!--
+                        <div class="address-select">
+                              <div class="address-details">
+                              {% if address %}
+                                    <input type="radio" name="bill"  id="r-b" value={{address.id}}>
+                                    <div class="address-dispay">
+                                    {{address.fname}} {{address.lname}}<br>
+                                    mobile no : {{ address.phone }}<br><br>
+                                    {{address}}</div><br>
+                                    <button id="edit">Edit</button>
+                              {% else %}
+                                    <button id="new">Add Now</button>
+                              {% endif %}
+                              </div>
+                        </div>
+                        -->
+                        <div class="shiping-form" id="billing-form">
+                              {% if Billing_form %}
+                              <div class="input-control">
+                                    {% for field in Billing_form %}
+                                    <small class="error" id="bill-{{field.name}}-error" >{{field.errors|striptags}}</small>
+                                    {{ field.label_tag }}
+                                    {{ field }} 
+
+                                    {% endfor %}
+                              </div>
+                              {% endif %}
+                        </div>
+                         <button type="button" class="add-sub" id="add-sub">Continue</button>
+                  </div>
+
+                  <div class="order-summery-container" id="order-summery-container">
+                        <div class="title">
+                              <h4>order summery</h4>
+                        </div>
+                        <div class="product-details">
+                        <h3>Cart products</h3>
+
+                        {% for cart in cart %}
+                        <div class="product">
+                              <img src="{{ cart.product.product_image.url }}" alt="" class="pro-img">
+                              <div class="npq">
+                                    <div class="name">{{cart.product.title}}</div>
+                                    <div class="price">{{cart.product.price}}</div>
+                                    <div class="quntity">
+                                          <div class="cart-add" >
+                                                <button type="submit" onclick="rmvqty('{{cart.product.id}}');" class="btn-remove" id="sub" data-product-id={{cart.product.id}}>-</button>
+                                                <input type="text" id="inp-val-{{cart.product.id}}" value={{cart.quantity}} min=1 >
+                                                <button type="submit" onclick="addqty('{{cart.product.id}}');" class="btn-add" id="add" data-product-id={{cart.product.id}}>+</button>
+                                          </div>
+                                          <a href="{% url 'remove_from_cart' cart_item_id=cart.id %}"><i class='bx bx-trash'></i></a>
+                                    </div>
+                              </div>
+                        </div>
+                        <hr>
+                        {% endfor %}
+                  </div>
+
+                  <div class="address-details">
+                        <h3>shipping address</h3>
+                        <div class="address-dispay" id="address-dispay">
+                        
+                        </div>
+                        <button type="button" id="edit-sum">Change</button>
+                  </div>
+
+                  <div class="billing-details">
+                        <input type="hidden" value={{address.id}}>
+                        <h3>billing address</h3>
+                        <div class="address-dispay" id="biling-address">
+                        </div>
+                        <button type="button" id="edit-sum">Change</button>
+                  </div>
+
+                  <button type="button" class="sum-sub" >Continue</button>
+                        </div>
+
+                  <div class="pyment-form-container" id="pyment-form-container">
+                        <div class="title">
+                              <h4>select payment method</h4>
+                        </div>
+                        <div class="cod">
+                              <input type="radio" name="pay" id="cod" value="COD" >
+                              <label for="cod">cash on delivery</label>
+                        </div>
+                        <div class="cod">
+                              <input type="radio" name="pay" id="UPI" value="UPI" >
+                              <label for="UPI">UPI</label>
+                        </div>
+                        
+                  </form>
+                        <button type="submit" class="pay-sub" id="submit" >Make Payment</button></a>
+                  </div>
+            </div>
+            <div class="col-sec" id='cart_reload'>
+                  <div class="title">
+                        <h4>price details</h4>
+                  </div>
+                  <hr>
+                  <div class="charges">
+                        <div class="sub-col">
+                              <span>Price({{cart_user.total_product}} items)</span>
+                              <h3 class="price"> ₹{{cart_user.total_cart}}</h3>
+                        </div>
+                        <div class="sub-col">
+                              <span>Shipping Charges</span>
+                              <h3 class="price">
+                                    {% if shipping_charge == 0 %}
+                                    Free
+                                    {% else %}
+                                    ₹{{shipping_charge}}
+                                    {% endif %}
+                              </h3>
+                        </div>
+                        <div class="sub-col">
+                              <span>Discount</span>
+                              <h3 class="price">- ₹ {{discount}}</h3>
+                        </div>
+                  </div>
+                  <hr>
+                  <div class="total">
+                        <span>total payable</span>
+                        <h3 class="price">{{total}}</h3>
+                  </div>
+            </div>
+      </section>
+
+       <style>
+            .input-control.success input {
+            border-color: #09c372;
+            }
+            .input-control.error input {
+            border-color: #ff3860;
+            }
+            .input-control .error {
+            color: #ff3860;
+            font-size: 9px;
+            
+            }
+      </style>
+      <script>
+    
+            
+
+            document.querySelector('.sum-sub').addEventListener('click',function(){
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  document.getElementById('order-summery-container').style.display = "none";
+                  document.getElementById('pyment-form-container').style.display="block";
+                  console.log('working')
+                  updateProgress(3);
+            });
+            
+            document.querySelector('.pay-sub').addEventListener('click',function(){
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  updateProgress(4);
+            });
+            
+            document.getElementById("submit").addEventListener("click", function() {
+            // Check if either radio button is checked
+            if (document.getElementById("cod").checked || document.getElementById("UPI").checked) {
+                  // Submit the form
+                  document.getElementById("order").submit();
+            } else {
+                  alert("Please select one of the options.");
+            }
+            });
+            
+            const progressItems = document.querySelectorAll('.progress li'); 
+            
+            function updateProgress(step) {
+                  progressItems.forEach((item, index) => {
+                        if (index < step) {
+                        item.classList.add('active');
+                        } else {
+                        item.classList.remove('active');
+                        }
+                  });
+            }
+
+            
+           
+           /*
+            document.querySelector('#edit').addEventListener('click',function(){
+                  document.getElementById('shiping-form').style.display = "block";
+                  document.querySelector('#edit').classList.toggle('hide');
+            })
+            document.querySelectorAll('#new').forEach(button=>{
+                        button.addEventListener('click',function(){
+                        console.log('working');
+                        document.getElementById('shiping-form').style.display = "block";
+                  });
+            });
+            */
+            document.querySelectorAll('#edit-sum').forEach(button=>{
+                        button.addEventListener('click',function(){
+                        console.log('working');
+                        document.getElementById('shiping-form-container').style.display = "block";
+                        document.getElementById('order-summery-container').style.display = "none";
+                        updateProgress(1);
+
+                  });
+            });
+            
+            
+      </script>
+      <script src="{% static 'js/validation.js' %}"></script>
+    {% endblock %}
+

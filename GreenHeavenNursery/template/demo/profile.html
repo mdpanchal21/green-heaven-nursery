@@ -1,0 +1,257 @@
+    {% extends 'base.html' %}
+    {% load static %}
+
+    {% block title %}product list{% endblock %}
+
+    {% block extra_head %}
+        <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    {% endblock %}
+
+    {% block content %}
+    <div class="pic" id="pic">
+      <form method="post" class="profile-pic" enctype="multipart/form-data">
+      <button  type="button" class="close-btn" onclick="closebtn()"><i class='bx bx-x'></i></button>
+        {% csrf_token %}
+        {{ profile_form.as_p }}
+        <button type="submit" class="pic-btn">Update Profile Picture</button>
+      </form>
+    </div>
+    
+    <section class="main-section">
+    <div class="section-one">
+    
+    {% if custuser.user_image %}
+      <img src="{{ custuser.user_image.url }}" alt="profile photo" class="profile-img">
+    {% else %}
+      <img src="{% static '/userpro.png' %}" alt="profile photo" class="profile-img">
+    {% endif %}
+    
+      <h4>{{name}}</h4>
+      <button type="button" class="pic-dic-btn" onclick="showpicform()">Change Pic</button>
+      <a href="{% url 'changepassword' %}"><strong>Change password</strong></a>
+      <!--<a href="{% url 'forget_password' %}"><strong>Forget password</strong></a>-->
+      <a href="{% url 'logout' %}"><button type="submit">logout</button></a>
+    </div>
+    
+    <div class="info-container">
+      <div class="section-second">
+        <form action="{% url 'updateprofile' %}" id="personal-form" method="post" novalidate>
+          {% csrf_token %}
+        <div class="info">
+            <h3>personal information</h3>
+            <div class="info-input">
+                {{ custform.first_name.errors }}
+                {{ custform.first_name }}
+                
+                {{ custform.last_name.errors }}
+                {{ custform.last_name }}
+            </div>
+        </div>
+
+        <div class="info">
+            <h3>Email adrress</h3>
+            <div class="info-input">
+              {{ custform.email.errors }}
+              {{ custform.email }}
+            </div>
+        </div>
+
+        <div class="info">
+            <h3>mobile number</h3>
+            <div class="info-input">
+              {{ custform.phone_one.errors }}
+              {{ custform.phone_one }}
+              {{ custform.phone_second.errors }}
+              {{ custform.phone_second }}
+            </div>
+        </div>
+
+          <button type="submit" class="sbbutton" id="submitprofileButton">submit</button>
+        </form>
+          <button type="submit" class="sbbutton" id="editprofileButton">edit</button>
+      </div>
+    
+      <div class="section-second add-info" id="address">
+      
+        <div class="info">
+          <h3 class="add-title">address</h3>
+          
+          {% if address %}
+            <div class="info-input" id="address-{{address.id}}">
+                <div name="add" id="add" class="address">
+                    <i class='bx bx-user-circle'></i> {{address.fname}} {{address.lname}}
+                    <br>
+                    <i class='bx bxs-phone'></i> +91 {{address.phone}}<br><br>
+                    <i class="fa-solid fa-location-dot"></i> {{address}}
+                <div class="e-d-btn">
+              
+                    <button type="submit" id="editButton" class="editButton">edit</button>
+                    <button onclick="deleteaddress('{{address.id}}')"  type="submit" id="editButton" class="deleteButton">Delete</button>
+            </div>
+                <div class="update-address">
+                  <form  method="post" id="personal-form" action="{% url 'update_address' %}">
+                    {% csrf_token %}
+                    <div class="extra-form">
+                            {% for field in address_form %}
+                                <div class="details">{{ field.label_tag }}</div>
+                                <div class="input">{{ field }} 
+                                    <small class="error">{{ field.errors|striptags }}</small>
+                                </div>
+                            {% endfor %}
+                    </div>
+                    <button type="submit" >update</button> 
+                  </form>
+                </div>
+                <!--
+                <textarea name="add" id="add" class="address"></textarea>
+                -->
+            </div>
+          {% else %}
+            <button type="submit" class="sbbutton" id="btn-new">new</button>
+            <div class="new-address" id="empty-form">
+              <form method="POST" action="{% url 'add_address' %}" data-parsley-validate="">
+                    {% csrf_token %} 
+                    {% for field in address_form %}
+                        <div class="extra-form">
+                            
+                                <label for="field.label_tag">{{ field.label_tag }}</label>
+                                <div class="input">{{ field }} 
+                                    <small class="error">{{ field.errors|striptags }}</small>
+                                </div>
+                            
+                        </div>
+                        {% endfor %}
+                    <button type="submit" class="sbbutton">update</button> 
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div> 
+
+<script>
+      $('#editButton').on('click',function(){
+                $('.update-address').show();
+                $('.e-d-btn').hide();
+      })
+
+      function deleteaddress(addressId){
+        var csrftoken = getCookie('csrftoken');
+        console.log("working")
+        
+        $.ajax({
+          type:'POST',
+          url:'/delete_address/'+addressId,
+          data:{
+            'csrfmiddlewaretoken':csrftoken,
+          },
+          success:function(response){
+            
+            console.log(response);
+            $("#address").load(location.href + " #address>*", "")
+          },
+          error:function(xhr,status,error){
+          console.log(error);
+          }
+        });
+      }
+
+      function closebtn(){
+            document.getElementById('pic').style.display = "none";
+        }
+        function showpicform(){
+          document.getElementById('pic').style.display = "block";
+        }
+
+        $('#btn-new').on('click',function(){
+            $('#empty-form').show();
+            $('#btn-new').hide();
+        })  
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              var cookies = document.cookie.split(';');
+              for (var i = 0; i < cookies.length; i++) {
+                  var cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+        }
+ 
+</script>
+
+  </section>
+  
+    <script src="{% static 'js/profile.js' %}"></script>
+    <style>
+                              .new-address{
+                              display: none;
+                              width: 100%;
+                              margin: 30px 0px;
+                              border-radius: 10px;
+                              padding: 20px 10px;
+                              box-shadow: 0px 2px 8px green;
+                              border: 1px solid green;
+                          }
+                  textarea{
+                        width: 100%;
+                        height: 100px;
+                        font-size: 20px;
+                        padding: 10px;
+                        border-radius: 10px;
+                        border: 2px solid green;
+                        resize: none;
+                    }
+                    select {
+                        width: 20%;
+                        /* height: 40px; */
+                        border-radius: 11px;
+                        padding: 10px;
+                        font-size: 20px;
+                    }
+                  </style>
+
+
+
+    <style>
+      .pic {
+        display:none;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          top: 0%;
+          z-index: 1000;
+          background-color: #80808078;
+      }
+      form.profile-pic {
+          width: 50%;
+          /* height: 30%; */
+          padding: 10px;
+          border-radius: 10px;
+          border: 2px solid green;
+          position: relative;
+          top: 25%;
+          left: 35%;
+          background-color: white;
+      }
+      .pic-btn {
+          padding: 5px;
+          margin-top: 10px;
+          border-radius: 5px;
+      }
+      button.pic-dic-btn{
+          background-color: white;
+          font-size: 15px;
+          color: green;
+          border: 1px solid;
+          padding: 5px;
+          margin: 5px 0px;
+      }
+
+    </style>
+    {% endblock %}

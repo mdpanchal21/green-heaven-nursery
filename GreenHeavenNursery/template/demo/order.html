@@ -1,0 +1,39 @@
+ {% extends 'base.html' %}
+    {% load static %}
+
+    {% block title %}product list{% endblock %}
+
+    {% block extra_head %}
+        <link rel="stylesheet" href="{% static 'css/order.css' %}">
+    {% endblock %}
+
+    {% block content %}
+
+      <div class="order-status">
+           <table id="order">
+            <tr class="title">
+                  <td>Order No</td>
+                  <td>Date</td>
+                  <td>Amount</td>
+                  <td>Status</td>
+                  <td>Payment</td>
+            </tr>
+            {% if order %}
+            {% for order in order %}
+            <tr class="details">
+                  <td><a href="{% url 'order_details' orderId=order.id %}">{{order.id}}</a></td>
+                  <td>{{order.created}}</td>
+                  <td>{{order.amount}}</td>
+                  <td>{{order.status}}</td>
+                  <td>Panding</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr class="details" style="color: gray;">
+                  <td colspan="5" style="font-size: 25px;">Your Order is Empty</td>
+            </tr>
+            {% endif %}
+           </table>
+      </div>
+
+     {% endblock %}
