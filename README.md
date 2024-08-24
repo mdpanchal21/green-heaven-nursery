@@ -17,10 +17,9 @@ it is a one e commerce platform which is made in python technology , and django 
         'PASSWORD': 'your_db_password',
         'HOST': 'localhost',  # Or the host where your MySQL is running
         'PORT': '3306',  # Default MySQL port
-    }
+    } 
 }
 " <<
-
 
 3rd : set the directory and type 
         "python manage.py runserver"
