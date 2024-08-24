@@ -11,7 +11,9 @@ it is a one e commerce platform which is made in python technology , and django 
       >> DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        
         'NAME': 'final',  # This is the name of the database
+        
         'USER': 'your_db_user',
         'PASSWORD': 'your_db_password',
         'HOST': 'localhost',  # Or the host where your MySQL is running
