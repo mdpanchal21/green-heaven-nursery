@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'GreenHeavenNursery.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "final",
+        "NAME": "ghnproject",
         "USER": "root",
         "PASSWORD": "",
         "HOST": "127.0.0.1",
